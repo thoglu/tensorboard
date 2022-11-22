@@ -54,6 +54,13 @@ bazel build tensorboard:tensorboard
 bazel run tensorboard -- --logdir path/to/logs
 ```
 
+To create pip package:
+```
+pip uninstall -y tensorboard tb-nightly tensorboard-plugin-wit
+bazel run //tensorboard/pip_package:extract_pip_package -- /tmp/tb
+pip install --upgrade /tmp/tb/tensorboard*py3*.whl
+```
+
 This should print that TensorBoard has started. Next, connect to
 http://localhost:6006.
 
