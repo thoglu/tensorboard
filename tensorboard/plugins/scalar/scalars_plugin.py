@@ -32,6 +32,9 @@ from tensorboard.data import provider
 from tensorboard.plugins import base_plugin
 from tensorboard.plugins.scalar import metadata
 
+import os
+import json
+
 _DEFAULT_DOWNSAMPLING = 1000  # scalars per time series
 
 
@@ -65,6 +68,7 @@ class ScalarsPlugin(base_plugin.TBPlugin):
     def get_plugin_apps(self):
         return {
             "/scalars": self.scalars_route,
+            "/configs_for_runs": self.configs_for_runs_route,
             "/scalars_multirun": self.scalars_multirun_route,
             "/tags": self.tags_route,
         }
@@ -83,7 +87,9 @@ class ScalarsPlugin(base_plugin.TBPlugin):
             experiment_id=experiment,
             plugin_name=metadata.PLUGIN_NAME,
         )
+
         result = {run: {} for run in mapping}
+        
         for (run, tag_to_content) in mapping.items():
             for (tag, metadatum) in tag_to_content.items():
                 md = metadata.parse_plugin_metadata(metadatum.plugin_content)
@@ -97,6 +103,40 @@ class ScalarsPlugin(base_plugin.TBPlugin):
                     "description": description,
                 }
         return result
+
+    def configs_for_runs_impl(self, ctx, list_of_runs):
+        """Returns the formatted config for each run."""
+
+        cfg_files=[os.path.join(i, "params.json") for i in list_of_runs]
+
+        formatted_configs=[]#dict()
+
+        if(len(list_of_runs)==0):
+            return formatted_configs
+
+        for c_ind,c in enumerate(cfg_files):
+
+            with open(c) as f_obj:
+                f=json.load(f_obj)
+
+                new_dict=dict()
+                for k in f.keys():
+                    if(k!="fixed_choices"):
+                        new_dict[k]=f[k]
+
+                if("fixed_choices" in f.keys()):
+                    for ow_key in f["fixed_choices"].keys():
+                        new_dict[ow_key]=f["fixed_choices"][ow_key]
+
+                json_str=json.dumps(new_dict)[1:-1]
+                
+                json_str=list_of_runs[c_ind]+"\n"+json_str
+                json_str=json_str.replace(":","=").replace(",","\n").replace(" ", "").replace('"', "")
+                
+                #formatted_configs[list_of_runs[c_ind]]=json_str
+                formatted_configs.append(json_str)
+
+        return formatted_configs
 
     def scalars_impl(self, ctx, tag, run, experiment, output_format):
         """Result of the form `(body, mime_type)`."""
@@ -142,7 +182,19 @@ class ScalarsPlugin(base_plugin.TBPlugin):
         ctx = plugin_util.context(request.environ)
         experiment = plugin_util.experiment_id(request.environ)
         index = self.index_impl(ctx, experiment=experiment)
+        
         return http_util.Respond(request, index, "application/json")
+
+    @wrappers.Request.application
+    def configs_for_runs_route(self, request):
+       
+        runs=request.args["run_list"].split(",")
+       
+        ctx = plugin_util.context(request.environ)
+    
+        combined_config_run_strings = self.configs_for_runs_impl(ctx, runs)
+            
+        return http_util.Respond(request, combined_config_run_strings, "application/json")
 
     @wrappers.Request.application
     def scalars_route(self, request):
@@ -157,6 +209,7 @@ class ScalarsPlugin(base_plugin.TBPlugin):
 
         ctx = plugin_util.context(request.environ)
         experiment = plugin_util.experiment_id(request.environ)
+        
         output_format = request.args.get("format")
         (body, mime_type) = self.scalars_impl(
             ctx, tag, run, experiment, output_format

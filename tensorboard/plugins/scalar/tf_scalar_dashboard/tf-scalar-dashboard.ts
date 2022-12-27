@@ -29,6 +29,7 @@ import '../../../components/tf_dashboard_common/tf-dashboard-layout';
 import '../../../components/tf_dashboard_common/tf-option-selector';
 import '../../../components/tf_paginated_view/tf-category-paginated-view';
 import '../../../components/tf_runs_selector/tf-runs-selector';
+import '../../../components/tf_runs_selector/tf-config-runs-selector';
 import * as tf_storage from '../../../components/tf_storage/storage';
 import * as tf_utils from '../../../components/tf_utils/utils';
 import * as vz_chart_helpers from '../../../components/vz_chart_helpers/vz-chart-helpers';
@@ -107,8 +108,8 @@ class TfScalarDashboard extends LegacyElementMixin(ArrayUpdateHelper) {
           </div>
         </div>
         <div class="sidebar-section runs-selector">
-          <tf-runs-selector selected-runs="{{_selectedRuns}}">
-          </tf-runs-selector>
+          <tf-config-runs-selector selected-runs="{{_selectedRuns}}">
+          </tf-config-runs-selector>
         </div>
       </div>
       <div class="center" slot="center">
@@ -356,18 +357,24 @@ class TfScalarDashboard extends LegacyElementMixin(ArrayUpdateHelper) {
     var tagFilter = this._tagFilter;
     let categories;
     let query = tagFilter;
+   
     const runToTag = _.mapValues(runToTagInfo, (x) => Object.keys(x));
+   
     categories = tf_categorization_utils.categorizeTags(
       runToTag as tf_categorization_utils.RunToTag,
       selectedRuns,
       query
     );
+
     categories.forEach((category) => {
+      
       category.items = category.items.map((item) => ({
         tag: item.tag,
         series: item.runs.map((run) => ({run, tag: item.tag})),
       }));
+     
     });
+    
     this.updateArrayProp('_categories', categories, this._getCategoryKey);
   }
 
