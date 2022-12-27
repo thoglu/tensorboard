@@ -53,7 +53,16 @@ bazel build tensorboard:tensorboard
 # or even more succinctly
 bazel run tensorboard -- --logdir path/to/logs
 ```
+# MODIFIED INSTALLATION:
 
+1) Get bazelisk and add it to path.
+
+2) Set environment variable 
+```
+export USE_BAZEL_VERSION=5.4.0
+```
+
+3)
 To create pip package:
 ```
 pip uninstall -y tensorboard tb-nightly tensorboard-plugin-wit

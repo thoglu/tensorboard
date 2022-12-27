@@ -136,9 +136,10 @@ class TfMultiCheckbox extends LegacyElementMixin(PolymerElement) {
       }
       .item-label-container {
         padding-left: 5px;
-        flex-grow: 1;
-        flex-shrink: 1;
-        width: 0px; /* hack to get the flex-grow to work properly */
+        width: 100%;
+        height: 100px;
+        overflow-y: scroll;
+        white-space: pre-line;
       }
       .tooltip-value-container {
         display: flex;
@@ -148,6 +149,7 @@ class TfMultiCheckbox extends LegacyElementMixin(PolymerElement) {
         text-align: right;
         padding-left: 2px;
       }
+
       .vertical-align-container {
         display: flex;
         justify-content: center;
