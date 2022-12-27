@@ -6,7 +6,8 @@ licenses(["notice"])
 
 tf_ts_library(
     name = "tf_runs_selector",
-    srcs = ["tf-runs-selector.ts"],
+    srcs = ["tf-runs-selector.ts",
+            "tf-config-runs-selector.ts"],
     strict_checks = False,
     deps = [
         "//tensorboard/components/polymer:irons_and_papers",
@@ -18,5 +19,7 @@ tf_ts_library(
         "//tensorboard/components/tf_wbr_string",
         "@npm//@polymer/decorators",
         "@npm//@polymer/polymer",
+        "@npm//@types/lodash",
+        "@npm//lodash",
     ],
 )
