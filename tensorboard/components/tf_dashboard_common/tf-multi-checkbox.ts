@@ -247,7 +247,7 @@ class TfMultiCheckbox extends LegacyElementMixin(PolymerElement) {
   get _regex(): RegExp | null {
     var regexString = this.regex;
     try {
-      return new RegExp(regexString);
+      return new RegExp(regexString, "s");
     } catch (e) {
       return null;
     }
