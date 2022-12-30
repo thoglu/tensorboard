@@ -83,10 +83,10 @@ class TfImageDashboard extends LegacyElementMixin(PolymerElement) {
           </div>
         </div>
         <div class="sidebar-section runs-selector">
-          <tf-runs-selector
+          <tf-config-runs-selector
             id="runs-selector"
             selected-runs="{{_selectedRuns}}"
-          ></tf-runs-selector>
+          ></tf-config-runs-selector>
         </div>
       </div>
       <div class="center" slot="center">
